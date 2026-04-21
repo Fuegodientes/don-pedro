@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cafetería Don Pedro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5EDD8;
+    --dark-brown: #2C1A0E;
+    --warm-brown: #5C3317;
+    --gold: #C8972A;
+    --bg-section: #FAF3E0;
+    --border: rgba(90,50,15,0.13);
+    --text-dark: #1A0F05;
+    --text-muted: #8B6340;
+    --red-spain: #c60b1e;
+    --yellow-spain: #ffc400;
+    --blue-uk: #012169;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', sans-serif; background: var(--dark-brown); min-height: 100vh; color: var(--text-dark); -webkit-font-smoothing: antialiased; }
+
+  /* ── SPLASH ── */
+  #splash {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem; position: relative; overflow: hidden;
+    background: radial-gradient(ellipse at center, #3D1F0A 0%, #1A0A02 100%);
+  }
+  #splash::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,151,42,0.05) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,151,42,0.05) 40px);
+  }
+  .splash-logo { text-align: center; margin-bottom: 3rem; position: relative; z-index: 1; }
+  .splash-logo .cafe-label { font-weight: 300; font-size: 12px; letter-spacing: 6px; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+  .splash-logo h1 { font-family: 'Playfair Display', serif; font-size: clamp(60px, 16vw, 96px); font-weight: 900; color: var(--cream); line-height: 0.9; text-shadow: 0 4px 30px rgba(200,151,42,0.25); }
+  .splash-logo h1 span { color: var(--gold); }
+  .splash-divider { width: 50px; height: 2px; background: var(--gold); margin: 1.1rem auto; }
+  .splash-subtitle { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--text-muted); }
+  .lang-prompt { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(200,151,42,0.55); margin-bottom: 1.4rem; position: relative; z-index: 1; }
+  .lang-buttons { display: flex; gap: 1rem; position: relative; z-index: 1; }
+  .lang-btn { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; cursor: pointer; padding: 1.2rem 2rem; border: 1.5px solid rgba(200,151,42,0.3); border-radius: 12px; background: rgba(200,151,42,0.05); transition: all 0.2s ease; }
+  .lang-btn:hover { border-color: var(--gold); background: rgba(200,151,42,0.12); transform: translateY(-2px); }
+  .flag { width: 48px; height: 32px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); }
+  .flag-es { display: flex; flex-direction: column; }
+  .flag-es .f1, .flag-es .f3 { background: var(--red-spain); flex: 1; }
+  .flag-es .f2 { background: var(--yellow-spain); flex: 2; }
+  .lang-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); }
+
+  /* ── MENU PAGE ── */
+  .menu-page { display: none; min-height: 100vh; background: var(--cream); }
+  .menu-header { background: var(--dark-brown); padding: 0.9rem 1.25rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--gold); }
+  .menu-header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: var(--cream); }
+  .menu-header-logo span { color: var(--gold); }
+  .back-btn { background: none; border: 1px solid rgba(200,151,42,0.4); color: var(--gold); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 5px 11px; border-radius: 6px; cursor: pointer; font-family: 'Lato', sans-serif; }
+
+  /* Category nav */
+  .cat-nav { background: var(--dark-brown); overflow-x: auto; scrollbar-width: none; display: flex; border-bottom: 1px solid rgba(200,151,42,0.15); -webkit-overflow-scrolling: touch; }
+  .cat-nav::-webkit-scrollbar { display: none; }
+  .cat-pill { flex-shrink: 0; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); padding: 9px 13px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; font-family: 'Lato', sans-serif; background: none; border-top: none; border-left: none; border-right: none; transition: all 0.2s; }
+  .cat-pill.active, .cat-pill:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* Sections */
+  .section-group { background: var(--bg-section); border-top: 3px solid var(--gold); margin-top: 1rem; }
+  .section-group-inner { padding: 1.2rem 1.25rem 0.6rem; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--warm-brown); text-transform: uppercase; letter-spacing: 2px; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 15px; background: var(--gold); border-radius: 2px; flex-shrink: 0; }
+  .section-subtitle { font-size: 11px; color: var(--text-muted); font-style: italic; margin-bottom: 0.6rem; margin-top: -0.4rem; }
+  .subsection-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 0.7rem 0 0.3rem; }
+
+  /* Menu items */
+  .menu-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--border); gap: 0.6rem; }
+  .menu-item:last-child { border-bottom: none; }
+  .item-left { flex: 1; min-width: 0; }
+  .item-name { font-size: 13.5px; font-weight: 400; color: var(--text-dark); line-height: 1.3; }
+  .item-featured .item-name { font-weight: 700; color: var(--warm-brown); }
+  .item-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; font-style: italic; }
+  .item-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .item-price { font-size: 13.5px; font-weight: 700; color: var(--warm-brown); white-space: nowrap; flex-shrink: 0; font-family: 'Playfair Display', serif; }
+
+  /* Allergen icons */
+  .allergens { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+  .al {
+    display: inline-flex; align-items: center; gap: 2px;
+    border-radius: 20px; padding: 2px 5px 2px 2px;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.3px;
+    line-height: 1; white-space: nowrap;
+  }
+  .al svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* Each allergen color */
+  .al-glu { background: #EADFC8; color: #5a3a0a; }
+  .al-hue { background: #FDEBD0; color: #7a3a00; }
+  .al-lac { background: #FDF5DC; color: #7a6000; }
+  .al-pes { background: #D6EAF8; color: #0a3d6b; }
+  .al-cru { background: #FADBD8; color: #7b1a15; }
+  .al-sul { background: #E8DAEF; color: #5b2c6f; }
+  .al-fru { background: #D5F5E3; color: #1a5a35; }  /* frutos cascara */
+  .al-ses { background: #FEF9E7; color: #7d6608; }
+  .al-mos { background: #FDEBD0; color: #6e3300; }
+  .al-mol { background: #D6EAF8; color: #154360; }
+  .al-alt { background: #FDFEFE; color: #17a589; }  /* altramuces */
+  .al-api { background: #D5F5E3; color: #196f3d; }  /* apio */
+  .al-cac { background: #FDEBD0; color: #784212; }  /* cacahuete */
+  .al-soj { background: #D5F5E3; color: #1e8449; }  /* soja */
+
+  /* Footer */
+  .menu-footer { background: var(--dark-brown); padding: 1.5rem 1.25rem; }
+  .allergen-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
+  .legend-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .legend-item svg { width: 26px; height: 26px; }
+  .legend-label { font-size: 8.5px; text-align: center; color: rgba(200,151,42,0.6); letter-spacing: 0.5px; line-height: 1.2; }
+  .allergen-note { font-size: 10px; color: rgba(200,151,42,0.45); letter-spacing: 0.3px; line-height: 1.6; text-align: center; border-top: 1px solid rgba(200,151,42,0.15); padding-top: 0.75rem; }
+
+  /* Scroll top */
+  .scroll-top { position: fixed; bottom: 1.5rem; right: 1.25rem; width: 38px; height: 38px; background: var(--gold); color: var(--dark-brown); border: none; border-radius: 50%; font-size: 16px; cursor: pointer; display: none; align-items: center; justify-content: center; font-weight: 700; z-index: 999; }
+  .scroll-top.visible { display: flex; }
+</style>
+</head>
+<body>
+
+<!-- SVG allergen icons defined once, reused everywhere -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <!-- GLUTEN - wheat stalk -->
+  <symbol id="ico-glu" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#C8972A"/>
+    <g fill="#fff">
+      <ellipse cx="10" cy="6" rx="2" ry="3" transform="rotate(-20 10 6)"/>
+      <ellipse cx="10" cy="6" rx="2" ry="3" transform="rotate(20 10 6)"/>
+      <ellipse cx="10" cy="10" rx="2" ry="3" transform="rotate(-20 10 10)"/>
+      <ellipse cx="10" cy="10" rx="2" ry="3" transform="rotate(20 10 10)"/>
+      <rect x="9.3" y="5" width="1.4" height="11" rx="0.7"/>
+    </g>
+  </symbol>
+  <!-- HUEVO - egg -->
+  <symbol id="ico-hue" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#E87B1E"/>
+    <ellipse cx="10" cy="10.5" rx="5" ry="6" fill="#fff" opacity="0.9"/>
+    <circle cx="10" cy="11" r="2.5" fill="#F5C542"/>
+  </symbol>
+  <!-- LACTEOS - milk drop -->
+  <symbol id="ico-lac" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#E8C830"/>
+    <path d="M10 4 C10 4 6 8 6 11.5 A4 4 0 0 0 14 11.5 C14 8 10 4 10 4Z" fill="#fff" opacity="0.9"/>
+  </symbol>
+  <!-- PESCADO - fish -->
+  <symbol id="ico-pes" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#2980B9"/>
+    <path d="M4 10 Q7 7 12 10 Q7 13 4 10Z" fill="#fff" opacity="0.9"/>
+    <path d="M12 7 L16 10 L12 13Z" fill="#fff" opacity="0.8"/>
+    <circle cx="6.5" cy="9.5" r="0.8" fill="#2980B9"/>
+  </symbol>
+  <!-- CRUSTACEOS - shrimp -->
+  <symbol id="ico-cru" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#C0392B"/>
+    <path d="M10 4 Q14 6 13 10 Q14 14 10 16 Q7 14 8 10 Q7 6 10 4Z" fill="#fff" opacity="0.85"/>
+    <line x1="10" y1="4" x2="8" y2="2" stroke="#fff" stroke-width="1"/>
+    <line x1="10" y1="4" x2="12" y2="2" stroke="#fff" stroke-width="1"/>
+  </symbol>
+  <!-- SULFITOS - grape bunch -->
+  <symbol id="ico-sul" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#8E44AD"/>
+    <circle cx="9" cy="8" r="2" fill="#fff" opacity="0.9"/>
+    <circle cx="11" cy="8" r="2" fill="#fff" opacity="0.9"/>
+    <circle cx="8" cy="11" r="2" fill="#fff" opacity="0.9"/>
+    <circle cx="12" cy="11" r="2" fill="#fff" opacity="0.9"/>
+    <circle cx="10" cy="14" r="2" fill="#fff" opacity="0.9"/>
+    <rect x="9.4" y="4" width="1.2" height="3" rx="0.6" fill="#fff"/>
+  </symbol>
+  <!-- FRUTOS CASCARA - nut -->
+  <symbol id="ico-fru" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#E07428"/>
+    <path d="M6 12 Q6 7 10 6 Q14 7 14 12 Q14 16 10 16 Q6 16 6 12Z" fill="#fff" opacity="0.9"/>
+    <path d="M10 6 Q10 8 8 9" stroke="#E07428" stroke-width="1" fill="none"/>
+  </symbol>
+  <!-- SESAMO - seeds -->
+  <symbol id="ico-ses" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#B8860B"/>
+    <ellipse cx="8" cy="8" rx="1.5" ry="2.5" fill="#fff" opacity="0.9" transform="rotate(-20 8 8)"/>
+    <ellipse cx="12" cy="8" rx="1.5" ry="2.5" fill="#fff" opacity="0.9" transform="rotate(20 12 8)"/>
+    <ellipse cx="10" cy="13" rx="1.5" ry="2.5" fill="#fff" opacity="0.9"/>
+  </symbol>
+  <!-- MOSTAZA - bottle -->
+  <symbol id="ico-mos" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#D4A017"/>
+    <rect x="8" y="6" width="4" height="9" rx="2" fill="#fff" opacity="0.9"/>
+    <rect x="8.5" y="4" width="3" height="2.5" rx="0.5" fill="#fff" opacity="0.7"/>
+  </symbol>
+  <!-- MOLUSCOS - shell -->
+  <symbol id="ico-mol" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#1A5276"/>
+    <path d="M5 13 Q5 7 10 6 Q15 7 15 13 Q15 15 10 15 Q5 15 5 13Z" fill="#fff" opacity="0.85"/>
+    <path d="M10 6 L10 15" stroke="#1A5276" stroke-width="0.8"/>
+    <path d="M7 8 Q10 10 13 8" stroke="#1A5276" stroke-width="0.8" fill="none"/>
+    <path d="M6.5 11 Q10 13 13.5 11" stroke="#1A5276" stroke-width="0.8" fill="none"/>
+  </symbol>
+  <!-- ALTRAMUCES - lupine -->
+  <symbol id="ico-alt" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#17A589"/>
+    <ellipse cx="10" cy="7" rx="2.5" ry="3.5" fill="#fff" opacity="0.9"/>
+    <ellipse cx="6.5" cy="11" rx="2.5" ry="3.5" fill="#fff" opacity="0.8" transform="rotate(-30 6.5 11)"/>
+    <ellipse cx="13.5" cy="11" rx="2.5" ry="3.5" fill="#fff" opacity="0.8" transform="rotate(30 13.5 11)"/>
+  </symbol>
+  <!-- APIO - celery leaf -->
+  <symbol id="ico-api" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#27AE60"/>
+    <path d="M10 16 Q10 10 7 6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M10 16 Q10 10 13 6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M10 13 Q8 11 6 12" stroke="#fff" stroke-width="1" fill="none"/>
+    <path d="M10 13 Q12 11 14 12" stroke="#fff" stroke-width="1" fill="none"/>
+  </symbol>
+  <!-- CACAHUETE - peanut -->
+  <symbol id="ico-cac" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#A04000"/>
+    <path d="M7 10 A3 4 0 0 1 13 10 A3 4 0 0 1 7 10Z" fill="#fff" opacity="0.9"/>
+    <circle cx="8.5" cy="10" r="1.5" fill="#A04000"/>
+    <circle cx="11.5" cy="10" r="1.5" fill="#A04000"/>
+    <rect x="9.5" y="6" width="1" height="9" rx="0.5" fill="#fff" opacity="0.6"/>
+  </symbol>
+  <!-- SOJA - soybean -->
+  <symbol id="ico-soj" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="10" fill="#1E8449"/>
+    <circle cx="10" cy="10" r="4.5" fill="#fff" opacity="0.9"/>
+    <circle cx="10" cy="10" r="2" fill="#1E8449"/>
+    <circle cx="10" cy="5.5" r="1.5" fill="#fff" opacity="0.7"/>
+    <circle cx="14.5" cy="12" r="1.5" fill="#fff" opacity="0.7"/>
+    <circle cx="5.5" cy="12" r="1.5" fill="#fff" opacity="0.7"/>
+  </symbol>
+</svg>
+
+<!-- Helper macro: allergen pill -->
+<!-- Usage: <span class="al al-XXX"><svg class=""><use href="#ico-xxx"/></svg> Label</span> -->
+
+<!-- ═══ SPLASH ═══ -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="cafe-label">Cafetería</div>
+    <h1>Don <span>Pedro</span></h1>
+    <div class="splash-divider"></div>
+    <div class="splash-subtitle">Menú · Menu</div>
+  </div>
+  <div class="lang-prompt">Selecciona tu idioma · Choose your language</div>
+  <div class="lang-buttons">
+    <button class="lang-btn" onclick="showMenu('es')">
+      <div class="flag flag-es"><div class="f1"></div><div class="f2"></div><div class="f3"></div></div>
+      <span class="lang-label">Español</span>
+    </button>
+    <button class="lang-btn" onclick="showMenu('en')">
+      <div class="flag">
+        <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" width="48" height="32">
+          <rect width="48" height="32" fill="#012169"/>
+          <path d="M0,0 L48,32 M48,0 L0,32" stroke="#fff" stroke-width="5.5"/>
+          <path d="M0,0 L48,32 M48,0 L0,32" stroke="#C8102E" stroke-width="3.5"/>
+          <path d="M24,0 V32 M0,16 H48" stroke="#fff" stroke-width="9"/>
+          <path d="M24,0 V32 M0,16 H48" stroke="#C8102E" stroke-width="5.5"/>
+        </svg>
+      </div>
+      <span class="lang-label">English</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MENÚ ESPAÑOL
+══════════════════════════════════════ -->
+<div id="menu-es" class="menu-page">
+  <div class="menu-header">
+    <div class="menu-header-logo">Don <span>Pedro</span></div>
+    <button class="back-btn" onclick="backToSplash()">← Idioma</button>
+  </div>
+  <div class="cat-nav">
+    <button class="cat-pill active" onclick="goTo('es-pitufos',this)">Pitufos</button>
+    <button class="cat-pill" onclick="goTo('es-cookies',this)">Cookies</button>
+    <button class="cat-pill" onclick="goTo('es-tostadas',this)">Tostadas</button>
+    <button class="cat-pill" onclick="goTo('es-croissant',this)">Croissant</button>
+    <button class="cat-pill" onclick="goTo('es-tartas',this)">Tartas</button>
+    <button class="cat-pill" onclick="goTo('es-camperos',this)">Camperos</button>
+    <button class="cat-pill" onclick="goTo('es-pizzas',this)">Pizzas</button>
+    <button class="cat-pill" onclick="goTo('es-nuestros',this)">Nuestros Platos</button>
+    <button class="cat-pill" onclick="goTo('es-zumos',this)">Zumos</button>
+    <button class="cat-pill" onclick="goTo('es-cafes',this)">Cafés</button>
+    <button class="cat-pill" onclick="goTo('es-tes',this)">Tés</button>
+    <button class="cat-pill" onclick="goTo('es-refrescos',this)">Refrescos</button>
+    <button class="cat-pill" onclick="goTo('es-cervezas',this)">Cervezas</button>
+    <button class="cat-pill" onclick="goTo('es-vinos',this)">Vinos</button>
+    <button class="cat-pill" onclick="goTo('es-gins',this)">Gins</button>
+    <button class="cat-pill" onclick="goTo('es-whiskys',this)">Whiskys</button>
+    <button class="cat-pill" onclick="goTo('es-ron',this)">Ron</button>
+    <button class="cat-pill" onclick="goTo('es-cavas',this)">Cavas</button>
+    <button class="cat-pill" onclick="goTo('es-cocktails',this)">Cócteles</button>
+  </div>
+
+  <div id="es-pitufos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Pitufos</div>
+      <div class="section-subtitle">Pan blanco o integral</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Bacon, salchichas, huevo y Cheddar</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Catalana (jamón ibérico, tomate y aceite)</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.70</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Queso manchego, aceite y tomate</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">3.20</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Atún, tomate, manchego y aceite</div>
+          <div class="allergens">
+            <span class="al al-pes"><svg><use href="#ico-pes"/></svg>Pescado</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">3.70</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Pollo, lechuga, tomate y alioli</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+          </div>
+        </div>
+        <div class="item-price">3.70</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Serrano: queso manchego</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Mantequilla y mermelada</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">2.20</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">York: pavo y queso</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">2.20</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tomate y aceite</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">1.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Serranito: pollo</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">4.20</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tortilla</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+          </div>
+        </div>
+        <div class="item-price">2.80</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-cookies" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cookies</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Pistacho</div>
+          <div class="allergens">
+            <span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustáceos</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Chocolate</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Nutella</div>
+          <div class="allergens">
+            <span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustáceos</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">3.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Alfajor de maicena</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">2.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Alfajor de chocolate</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">2.50</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-tostadas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Tostadas</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Jamón ibérico, manchego, aceite o mantequilla</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">4.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Mantequilla y mermelada</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">2.70</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tomate, atún y queso manchego</div>
+          <div class="allergens">
+            <span class="al al-pes"><svg><use href="#ico-pes"/></svg>Pescado</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.30</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tomate y aceite de oliva</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">2.40</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Sandwich mixto</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">2.50</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-croissant" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Croissant</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Mini croissant de jamón York y queso <span class="item-sub">(2 Uds.)</span></div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">1.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Napolitana de chocolate</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">1.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Croissant de chocolate</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">2.60</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Croissant mixto</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">2.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Croissant</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">1.90</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-tartas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Tartas Caseras</div>
+      <div class="section-subtitle">Ver vitrina · Tartas de la madre de Cris</div>
+      <div class="subsection-title">Tartas de queso</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de queso clásica</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de queso y pistacho</div>
+          <div class="allergens">
+            <span class="al al-alt"><svg><use href="#ico-alt"/></svg>Altramuces</span>
+            <span class="al al-api"><svg><use href="#ico-api"/></svg>Apio</span>
+            <span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustáceos</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de queso y brownie</div>
+          <div class="allergens">
+            <span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustáceos</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de queso de zanahoria</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de coco y dulce de leche</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="subsection-title">Otras tartas</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de queso 3 chocolates</div>
+          <div class="allergens">
+            <span class="al al-alt"><svg><use href="#ico-alt"/></svg>Altramuces</span>
+            <span class="al al-api"><svg><use href="#ico-api"/></svg>Apio</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">4.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tarta de manzana</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Cheesecake de frutos rojos</div>
+          <div class="allergens">
+            <span class="al al-alt"><svg><use href="#ico-alt"/></svg>Altramuces</span>
+            <span class="al al-api"><svg><use href="#ico-api"/></svg>Apio</span>
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-fru"><svg><use href="#ico-fru"/></svg>Fr. cáscara</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">4.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Tartas 3 leches</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">5.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Enteras por encargo, desde…</div>
+        </div>
+        <div class="item-price">45.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-camperos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Platos Camperos</div>
+
+      <div class="menu-item item-featured">
+        <div class="item-left">
+          <div class="item-name">Martina</div>
+          <div class="item-desc">Cerdo horneado, pimientos, bacon, huevo, hojas verdes, tomates y mayonesa</div>
+          <div class="allergens">
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">7.50</div>
+      </div>
+
+      <div class="menu-item item-featured">
+        <div class="item-left">
+          <div class="item-name">Renata</div>
+          <div class="item-desc">Bacon, salsa barbacoa / ketchup, salchichas, queso Cheddar y huevo</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">7.00</div>
+      </div>
+
+      <div class="menu-item item-featured">
+        <div class="item-left">
+          <div class="item-name">Emilia</div>
+          <div class="item-desc">Pollo, tomates, hojas verdes, pimientos, alioli, cebolla caramelizada</div>
+          <div class="allergens">
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+          </div>
+        </div>
+        <div class="item-price">7.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-pizzas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Pizzas</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Jamón y queso</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Carbonara</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Frankfurt</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Peperoni</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">4 quesos</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-nuestros" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Nuestros Platos</div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Perrito caliente</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">1.90</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Perrito caliente bacon y Cheddar</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">3.20</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Aros de pollo</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">7.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Aros de Mozzarella</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">7.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Burrito de Cerdo / Pollo / Ternera</div>
+          <div class="item-sub">Con patatas</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">7.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Ensaladilla rusa de atún</div>
+          <div class="allergens">
+            <span class="al al-pes"><svg><use href="#ico-pes"/></svg>Pescado</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+          </div>
+        </div>
+        <div class="item-price">4.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Fingers de pollo crujientes</div>
+          <div class="allergens">
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">8.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Codillo horneado y patatas</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+            <span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfitos</span>
+          </div>
+        </div>
+        <div class="item-price">9.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">1/4 de pollo asado y patatas</div>
+        </div>
+        <div class="item-price">8.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Nachos: bacon, salsa guacamole, queso Cheddar y alioli</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">8.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Empanada venezolana</div>
+          <div class="item-sub">Plátano y queso / Queso / Carne / Pollo</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Empanada venezolana carne mechada</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+            <span class="al al-hue"><svg><use href="#ico-hue"/></svg>Huevo</span>
+            <span class="al al-lac"><svg><use href="#ico-lac"/></svg>Lácteos</span>
+          </div>
+        </div>
+        <div class="item-price">4.50</div>
+      </div>
+
+      <div class="menu-item">
+        <div class="item-left">
+          <div class="item-name">Cachitos (Jamón y queso / Bacon y York)</div>
+          <div class="allergens">
+            <span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span>
+          </div>
+        </div>
+        <div class="item-price">4.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="es-zumos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Zumos</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Melocotón</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Manzana</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Piña</div></div><div class="item-price">2.50</div></div>
+      <div class="subsection-title">Zumo de naranja natural</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pequeño</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Grande</div></div><div class="item-price">3.20</div></div>
+    </div>
+  </div>
+
+  <div id="es-cafes" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cafés</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Expresso</div></div><div class="item-price">1.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Expresso con leche</div></div><div class="item-price">1.60</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Mediano solo</div></div><div class="item-price">1.80</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Solo con hielo</div></div><div class="item-price">1.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Con leche</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Sin lactosa</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Americano</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Doble con leche</div></div><div class="item-price">2.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Colacao</div></div><div class="item-price">2.30</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Cappuccino</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Bombón</div></div><div class="item-price">2.80</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Latte chocolate</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Latte fresa</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Latte caramelo</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Con Baileys</div></div><div class="item-price">5.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Café irlandés</div></div><div class="item-price">5.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-tes" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Tés</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té Rojo</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té Negro</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Manzanilla</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té digestivo</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té verde de jazmín</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té negro especiado</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Rooibos piña y coco</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té rojo menta poleo</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Rooibos cítricos y flores</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Té con leche</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Infusión frutos rojos</div></div><div class="item-price">2.80</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Frutas del bosque</div></div><div class="item-price">2.80</div></div>
+    </div>
+  </div>
+
+  <div id="es-refrescos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Refrescos</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Agua sin gas</div></div><div class="item-price">1.80</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Agua con gas</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Coca Cola, Zero y 00</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Fanta de limón y naranja</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Sprite</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Fuze tea limón / Maracuyá</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Schweppes tónica</div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Monster mango loco</div></div><div class="item-price">2.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Monster green y ultra</div></div><div class="item-price">2.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Royal Bliss</div></div><div class="item-price">3.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Aquarius</div></div><div class="item-price">3.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Maltín</div></div><div class="item-price">3.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-cervezas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cervezas</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Caña</div></div><div class="item-price">2.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa</div></div><div class="item-price">2.80</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia</div></div><div class="item-price">3.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia 00</div></div><div class="item-price">3.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">1906</div></div><div class="item-price">3.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Lupia</div></div><div class="item-price">3.30</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">1906 Red</div></div><div class="item-price">3.30</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia sin gluten</div></div><div class="item-price">3.30</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Peroni</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia 0% tostada</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Brewdog Punk IPA</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pinta</div></div><div class="item-price">4.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-vinos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Vinos</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tinto de verano</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa de vino rosado</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa de vino tinto</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa de vino Verdejo</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa vino blanco semidulce</div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa Tinto Cillar de Silos</div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa de vino Chardonnay</div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella de vino tinto (Casa)</div></div><div class="item-price">12.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella vino Verdejo</div></div><div class="item-price">12.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella vino Rosado</div></div><div class="item-price">12.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella de vino Chardonnay</div></div><div class="item-price">14.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella de vino tinto Cillar</div></div><div class="item-price">15.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-gins" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Gins</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Beefeater</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Larios</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Larios 12</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Larios Rosé</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tanqueray</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tanqueray 00</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Seagram's</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Bombay</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Hendrick's</div></div><div class="item-price">9.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-whiskys" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Whiskys</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">J&amp;B</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Ballantines</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Dewars White Label</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">J.Walker Red Label</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">DYC</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Copa Seagram's</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Jameson</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Jack Daniel's</div></div><div class="item-price">8.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">J. Walker Black Label</div></div><div class="item-price">8.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chivas 12 años</div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">J. Walker Doble Black Label</div></div><div class="item-price">12.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Macallan 12 años</div></div><div class="item-price">15.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chivas 18 años</div></div><div class="item-price">15.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-ron" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Ron</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Brugal</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Barcelo</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Cacique</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Legendario</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Santa Teresa</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Bacardi (blanco)</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Havanna Club 7</div></div><div class="item-price">7.50</div></div>
+    </div>
+  </div>
+
+  <div id="es-cavas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cavas</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Sidra</div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Benjamín</div></div><div class="item-price">5.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Brut Rosé</div></div><div class="item-price">5.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Carta Nevada</div></div><div class="item-price">5.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Botella de cava Codorniu</div></div><div class="item-price">30.00</div></div>
+    </div>
+  </div>
+
+  <div id="es-cocktails" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cócteles</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chupitos</div></div><div class="item-price">2.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pacharán Zoco</div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pacharán Baines</div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Vermouth</div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Martini Blanco / Rosso</div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Sangría</div></div><div class="item-price">6.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Fernet y Coca Cola</div></div><div class="item-price">6.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Mojito</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Cuba Libre Bacardi</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Campari</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Aperol Spritz</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Caipiriña</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Daiquiri</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Vodka Smirnoff</div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Jagermeister + Monster</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Vodka Absolut</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Margarita</div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Negroni</div></div><div class="item-price">8.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Don Pedro</div></div><div class="item-price">9.00</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER ES -->
+  <div class="menu-footer">
+    <div class="allergen-legend">
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-glu"/></svg><div class="legend-label">Gluten</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-hue"/></svg><div class="legend-label">Huevo<br>Egg</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-lac"/></svg><div class="legend-label">Lácteos<br>Dairy</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-pes"/></svg><div class="legend-label">Pescado<br>Fish</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-cru"/></svg><div class="legend-label">Crustáceos</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-sul"/></svg><div class="legend-label">Sulfitos<br>Sulfite</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-fru"/></svg><div class="legend-label">Fr. cáscara<br>Tree nuts</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-ses"/></svg><div class="legend-label">Sésamo<br>Sesame</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-mos"/></svg><div class="legend-label">Mostaza<br>Mustard</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-mol"/></svg><div class="legend-label">Moluscos<br>Mollusc</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-alt"/></svg><div class="legend-label">Altramuces<br>Lupines</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-api"/></svg><div class="legend-label">Apio<br>Celery</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-cac"/></svg><div class="legend-label">Cacahuete<br>Peanut</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-soj"/></svg><div class="legend-label">Soja<br>Soy</div></div>
+    </div>
+    <div class="allergen-note">Nuestros productos pueden contener los siguientes alérgenos.<br>Por favor, consulte al camarero.</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     ENGLISH MENU — same structure, English text
+     Allergens identical to ES version
+══════════════════════════════════════ -->
+<div id="menu-en" class="menu-page">
+  <div class="menu-header">
+    <div class="menu-header-logo">Don <span>Pedro</span></div>
+    <button class="back-btn" onclick="backToSplash()">← Language</button>
+  </div>
+  <div class="cat-nav">
+    <button class="cat-pill active" onclick="goTo('en-pitufos',this)">Pitufos</button>
+    <button class="cat-pill" onclick="goTo('en-cookies',this)">Cookies</button>
+    <button class="cat-pill" onclick="goTo('en-toasts',this)">Toasts</button>
+    <button class="cat-pill" onclick="goTo('en-croissant',this)">Croissant</button>
+    <button class="cat-pill" onclick="goTo('en-cakes',this)">Cakes</button>
+    <button class="cat-pill" onclick="goTo('en-main',this)">Main Dishes</button>
+    <button class="cat-pill" onclick="goTo('en-pizzas',this)">Pizzas</button>
+    <button class="cat-pill" onclick="goTo('en-our',this)">Our Dishes</button>
+    <button class="cat-pill" onclick="goTo('en-juices',this)">Juices</button>
+    <button class="cat-pill" onclick="goTo('en-coffees',this)">Coffees</button>
+    <button class="cat-pill" onclick="goTo('en-teas',this)">Teas</button>
+    <button class="cat-pill" onclick="goTo('en-soft',this)">Soft Drinks</button>
+    <button class="cat-pill" onclick="goTo('en-beers',this)">Beers</button>
+    <button class="cat-pill" onclick="goTo('en-wines',this)">Wines</button>
+    <button class="cat-pill" onclick="goTo('en-gins',this)">Gins</button>
+    <button class="cat-pill" onclick="goTo('en-whiskys',this)">Whiskys</button>
+    <button class="cat-pill" onclick="goTo('en-rum',this)">Rum</button>
+    <button class="cat-pill" onclick="goTo('en-cavas',this)">Cavas</button>
+    <button class="cat-pill" onclick="goTo('en-cocktails',this)">Cocktails</button>
+  </div>
+
+  <div id="en-pitufos" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Pitufos</div>
+      <div class="section-subtitle">White or whole wheat bread</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Bacon, sausages, egg and Cheddar</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Catalana (iberico, tomato and oil)</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Manchego cheese, oil and tomato</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">3.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tuna, tomato, Manchego and oil</div><div class="allergens"><span class="al al-pes"><svg><use href="#ico-pes"/></svg>Fish</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">3.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chicken, lettuce, tomato and aioli</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span></div></div><div class="item-price">3.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Serrano and Manchego cheese</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Butter and jam</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">2.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">York turkey and cheese</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">2.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tomato and oil</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">1.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Serranito: Chicken</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">4.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tortilla</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span></div></div><div class="item-price">2.80</div></div>
+    </div>
+  </div>
+
+  <div id="en-cookies" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Cookies</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pistachio</div><div class="allergens"><span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustacean</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chocolate</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Nutella</div><div class="allergens"><span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustacean</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">3.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Cornstarch alfajor</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">2.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chocolate alfajor</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">2.50</div></div>
+    </div>
+  </div>
+
+  <div id="en-toasts" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Toasts</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">J. Iberian, Manchego, oil and butter</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">4.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Butter and jam</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">2.70</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tomato, tuna, Manchego cheese</div><div class="allergens"><span class="al al-pes"><svg><use href="#ico-pes"/></svg>Fish</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.30</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tomato and olive oil</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">2.40</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Mixed sandwich</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">2.50</div></div>
+    </div>
+  </div>
+
+  <div id="en-croissant" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Croissant</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Mini croissant York &amp; cheese <span class="item-sub">(2 units)</span></div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">1.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chocolate bread (Napolitana)</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">1.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Croissant chocolate</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">2.60</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Croissant mixed</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">2.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Croissant</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">1.90</div></div>
+    </div>
+  </div>
+
+  <div id="en-cakes" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Homemade Cakes</div>
+      <div class="section-subtitle">See display case · Cris's Mother's Cakes</div>
+      <div class="subsection-title">Cheesecakes</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Classic cheesecake</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Pistachio cheesecake</div><div class="allergens"><span class="al al-alt"><svg><use href="#ico-alt"/></svg>Lupines</span><span class="al al-api"><svg><use href="#ico-api"/></svg>Celery</span><span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustacean</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span></div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Brownie cheesecake</div><div class="allergens"><span class="al al-cru"><svg><use href="#ico-cru"/></svg>Crustacean</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span></div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Carrot cake</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Coconut and caramel sauce cake</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.00</div></div>
+      <div class="subsection-title">Other cakes</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">3 Chocolate cheesecake</div><div class="allergens"><span class="al al-alt"><svg><use href="#ico-alt"/></svg>Lupines</span><span class="al al-api"><svg><use href="#ico-api"/></svg>Celery</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Apple pie</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Red fruit cheesecake</div><div class="allergens"><span class="al al-alt"><svg><use href="#ico-alt"/></svg>Lupines</span><span class="al al-api"><svg><use href="#ico-api"/></svg>Celery</span><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-fru"><svg><use href="#ico-fru"/></svg>Tree nuts</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">3 milk cakes</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">5.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Whole cakes to order, from…</div></div><div class="item-price">45.00</div></div>
+    </div>
+  </div>
+
+  <div id="en-main" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Main Dishes</div>
+      <div class="menu-item item-featured"><div class="item-left"><div class="item-name">Martina</div><div class="item-desc">Baked pork, peppers, bacon, egg, green leaves, tomatoes and mayonnaise</div><div class="allergens"><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">7.50</div></div>
+      <div class="menu-item item-featured"><div class="item-left"><div class="item-name">Renata</div><div class="item-desc">Bacon, BBQ sauce/ketchup, sausage, Cheddar cheese, and egg</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item item-featured"><div class="item-left"><div class="item-name">Emilia</div><div class="item-desc">Chicken, tomatoes, green leaves, peppers, aioli, caramelized onion</div><div class="allergens"><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span></div></div><div class="item-price">7.00</div></div>
+    </div>
+  </div>
+
+  <div id="en-pizzas" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Pizzas</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Ham and cheese</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Carbonara</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Frankfurt</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Peperoni</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">4 cheeses</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">9.00</div></div>
+    </div>
+  </div>
+
+  <div id="en-our" class="section-group">
+    <div class="section-group-inner">
+      <div class="section-title">Our Dishes</div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Hot dog</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">1.90</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Bacon and cheddar hot dog</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">3.20</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chicken rings</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Mozzarella Sticks</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Chicken/Meat/Beef Burrito</div><div class="item-sub">With chips</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">7.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Tuna russian salad</div><div class="allergens"><span class="al al-pes"><svg><use href="#ico-pes"/></svg>Fish</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span></div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Crispy chicken fingers</div><div class="allergens"><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">8.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Baked knuckle and potatoes</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span><span class="al al-sul"><svg><use href="#ico-sul"/></svg>Sulfite</span></div></div><div class="item-price">9.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">1/4 Roasted chicken and potatoes</div></div><div class="item-price">8.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Nachos bacon, guacamole, Cheddar and aioli</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">8.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Venezuelan pie (empanada)</div><div class="item-sub">Banana &amp; cheese / Cheese / Meat / Chicken</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.00</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Venezuelan pie with shredded beef</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span><span class="al al-hue"><svg><use href="#ico-hue"/></svg>Egg</span><span class="al al-lac"><svg><use href="#ico-lac"/></svg>Dairy</span></div></div><div class="item-price">4.50</div></div>
+      <div class="menu-item"><div class="item-left"><div class="item-name">Cachitos (Ham &amp; cheese / Bacon &amp; York)</div><div class="allergens"><span class="al al-glu"><svg><use href="#ico-glu"/></svg>Gluten</span></div></div><div class="item-price">4.00</div></div>
+    </div>
+  </div>
+
+  <div id="en-juices" class="section-group"><div class="section-group-inner"><div class="section-title">Juices</div><div class="menu-item"><div class="item-left"><div class="item-name">Peach</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Apple</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Pineapple</div></div><div class="item-price">2.50</div></div><div class="subsection-title">Fresh Orange Juice</div><div class="menu-item"><div class="item-left"><div class="item-name">Small</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Large</div></div><div class="item-price">3.20</div></div></div></div>
+
+  <div id="en-coffees" class="section-group"><div class="section-group-inner"><div class="section-title">Coffees</div><div class="menu-item"><div class="item-left"><div class="item-name">Espresso</div></div><div class="item-price">1.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Espresso with milk</div></div><div class="item-price">1.60</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Medium black</div></div><div class="item-price">1.80</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Iced black coffee</div></div><div class="item-price">1.90</div></div><div class="menu-item"><div class="item-left"><div class="item-name">With milk</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Lactose-free coffee</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">American</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Double with milk</div></div><div class="item-price">2.20</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Colacao</div></div><div class="item-price">2.30</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Cappuccino</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bombón coffee</div></div><div class="item-price">2.80</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Chocolate latte</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Strawberry latte</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Caramel latte</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">With Baileys</div></div><div class="item-price">5.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Irish coffee</div></div><div class="item-price">5.00</div></div></div></div>
+
+  <div id="en-teas" class="section-group"><div class="section-group-inner"><div class="section-title">Teas</div><div class="menu-item"><div class="item-left"><div class="item-name">Red tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Black tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Chamomile</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Digestive tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Jasmine green tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Spiced black tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Pineapple &amp; coconut</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Red mint pennyroyal</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Citrus fruits and flowers tea</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Tea with milk</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Red fruits infusion</div></div><div class="item-price">2.80</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Forest fruits tea</div></div><div class="item-price">2.80</div></div></div></div>
+
+  <div id="en-soft" class="section-group"><div class="section-group-inner"><div class="section-title">Soft Drinks</div><div class="menu-item"><div class="item-left"><div class="item-name">Water</div></div><div class="item-price">1.80</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Sparkling water</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Coca Cola, Zero and 00</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Fanta lemon and orange</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Sprite</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Fuze tea lemon/passion fruit</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Schweppes tonic</div></div><div class="item-price">2.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Monster mango loco</div></div><div class="item-price">2.70</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Monster green and ultra</div></div><div class="item-price">2.70</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Royal Bliss</div></div><div class="item-price">3.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Aquarius</div></div><div class="item-price">3.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Maltin</div></div><div class="item-price">3.00</div></div></div></div>
+
+  <div id="en-beers" class="section-group"><div class="section-group-inner"><div class="section-title">Beers</div><div class="menu-item"><div class="item-left"><div class="item-name">Beer</div></div><div class="item-price">2.20</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass</div></div><div class="item-price">2.80</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia</div></div><div class="item-price">3.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia 00</div></div><div class="item-price">3.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">1906</div></div><div class="item-price">3.20</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Lupia</div></div><div class="item-price">3.30</div></div><div class="menu-item"><div class="item-left"><div class="item-name">1906 Red</div></div><div class="item-price">3.30</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia gluten free</div></div><div class="item-price">3.30</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Peroni</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Estrella Galicia 0% tostada</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Brewdog Punk IPA</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Pint</div></div><div class="item-price">4.00</div></div></div></div>
+
+  <div id="en-wines" class="section-group"><div class="section-group-inner"><div class="section-title">Wines</div><div class="menu-item"><div class="item-left"><div class="item-name">Summer wine</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass rosé wine</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass red wine</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass Verdejo wine</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Semi-sweet white wine</div></div><div class="item-price">4.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass red wine Cillar de Silos</div></div><div class="item-price">4.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Glass Chardonnay</div></div><div class="item-price">4.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle red wine (House)</div></div><div class="item-price">12.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle Verdejo wine</div></div><div class="item-price">12.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle rosé wine</div></div><div class="item-price">12.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle Chardonnay wine</div></div><div class="item-price">14.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle Cillar de Silos red wine</div></div><div class="item-price">15.00</div></div></div></div>
+
+  <div id="en-gins" class="section-group"><div class="section-group-inner"><div class="section-title">Gins</div><div class="menu-item"><div class="item-left"><div class="item-name">Beefeater</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Larios</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Larios 12</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Larios Rosé</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Tanqueray</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Tanqueray 00</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Seagram's</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bombay</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Hendrick's</div></div><div class="item-price">9.00</div></div></div></div>
+
+  <div id="en-whiskys" class="section-group"><div class="section-group-inner"><div class="section-title">Whiskys</div><div class="menu-item"><div class="item-left"><div class="item-name">J&amp;B</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Ballantines</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Dewars White Label</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">J.Walker Red Label</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">DYC</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Copa Seagram's</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Jameson</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Jack Daniel's</div></div><div class="item-price">8.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">J. Walker Black Label</div></div><div class="item-price">8.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Chivas 12 years</div></div><div class="item-price">9.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">J. Walker Doble Black Label</div></div><div class="item-price">12.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Macallan 12 years</div></div><div class="item-price">15.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Chivas 18 years</div></div><div class="item-price">15.00</div></div></div></div>
+
+  <div id="en-rum" class="section-group"><div class="section-group-inner"><div class="section-title">Rum</div><div class="menu-item"><div class="item-left"><div class="item-name">Brugal</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Barcelo</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Cacique</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Legendario</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Santa Teresa</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bacardi (blanco)</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Havanna Club 7</div></div><div class="item-price">7.50</div></div></div></div>
+
+  <div id="en-cavas" class="section-group"><div class="section-group-inner"><div class="section-title">Cavas</div><div class="menu-item"><div class="item-left"><div class="item-name">Sidra (cider)</div></div><div class="item-price">4.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Benjamín</div></div><div class="item-price">5.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Brut Rosé</div></div><div class="item-price">5.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Carta Nevada</div></div><div class="item-price">5.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Bottle Cava Codorniu</div></div><div class="item-price">30.00</div></div></div></div>
+
+  <div id="en-cocktails" class="section-group"><div class="section-group-inner"><div class="section-title">Cocktails</div><div class="menu-item"><div class="item-left"><div class="item-name">Chupitos (shorts)</div></div><div class="item-price">2.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Pacharán Zoco</div></div><div class="item-price">3.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Pacharán Baines</div></div><div class="item-price">4.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Vermouth</div></div><div class="item-price">4.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Martini Blanco / Rosso</div></div><div class="item-price">4.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Sangría</div></div><div class="item-price">6.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Fernet and Coca Cola</div></div><div class="item-price">6.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Mojito</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Cuba Libre Bacardi</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Campari</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Aperol Spritz</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Caipiriña</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Daiquiri</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Vodka Smirnoff</div></div><div class="item-price">7.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Jagermeister + Monster</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Vodka Absolut</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Margarita</div></div><div class="item-price">7.50</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Negroni</div></div><div class="item-price">8.00</div></div><div class="menu-item"><div class="item-left"><div class="item-name">Don Pedro</div></div><div class="item-price">9.00</div></div></div></div>
+
+  <!-- FOOTER EN -->
+  <div class="menu-footer">
+    <div class="allergen-legend">
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-glu"/></svg><div class="legend-label">Gluten</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-hue"/></svg><div class="legend-label">Egg</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-lac"/></svg><div class="legend-label">Dairy</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-pes"/></svg><div class="legend-label">Fish</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-cru"/></svg><div class="legend-label">Crustacean</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-sul"/></svg><div class="legend-label">Sulfite</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-fru"/></svg><div class="legend-label">Tree nuts</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-ses"/></svg><div class="legend-label">Sesame</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-mos"/></svg><div class="legend-label">Mustard</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-mol"/></svg><div class="legend-label">Mollusc</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-alt"/></svg><div class="legend-label">Lupines</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-api"/></svg><div class="legend-label">Celery</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-cac"/></svg><div class="legend-label">Peanut</div></div>
+      <div class="legend-item"><svg viewBox="0 0 20 20"><use href="#ico-soj"/></svg><div class="legend-label">Soy</div></div>
+    </div>
+    <div class="allergen-note">Our products may contain the following allergens. Please consult the waiter.</div>
+  </div>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function showMenu(lang) {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('menu-' + lang).style.display = 'block';
+  window.scrollTo(0, 0);
+}
+function backToSplash() {
+  document.getElementById('menu-es').style.display = 'none';
+  document.getElementById('menu-en').style.display = 'none';
+  document.getElementById('splash').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+function goTo(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const top = el.getBoundingClientRect().top + window.pageYOffset - 115;
+  window.scrollTo({ top, behavior: 'smooth' });
+  const nav = btn.closest('.cat-nav');
+  nav.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 300);
+});
+</script>
+</body>
+</html>
